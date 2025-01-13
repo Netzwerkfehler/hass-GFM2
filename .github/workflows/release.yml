@@ -24,6 +24,6 @@ jobs:
           zip gfm2.zip -r ./
 
       - name: "Upload the ZIP file to the release"
-        uses: "softprops/action-gh-release@v2.2.0"
+        uses: "softprops/action-gh-release@v2.2.1"
         with:
           files: ${{ github.workspace }}/custom_components/gfm2/gfm2.zip
