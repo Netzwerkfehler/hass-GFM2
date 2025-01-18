@@ -77,6 +77,7 @@ ENTITY_DESCRIPTIONS = (
         device_class=SensorDeviceClass.DURATION,
         state_class=SensorStateClass.TOTAL_INCREASING,
         native_unit_of_measurement=UnitOfTime.SECONDS,
+        suggested_unit_of_measurement=UnitOfTime.DAYS,
     ),
     SensorEntityDescription(
         key="status_txpower",
