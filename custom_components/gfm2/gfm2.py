@@ -55,7 +55,7 @@ class Gfm2:
         """Read data from the reboot.json endpoint."""
         data = Gfm2.process_json(await self._api.async_get_reboot_data(), "reboot")
         data["custom_last_reboot"] = datetime.strptime(
-            f"{data["reboot_reboot_date"]} {data["reboot_reboot_time"]}",
+            f"{data['reboot_reboot_date']} {data['reboot_reboot_time']}",
             "%d.%m.%Y %H:%M",
         ).replace(tzinfo=ZoneInfo("UTC"))
         return data
@@ -103,6 +103,6 @@ class Gfm2:
         flattened_data: dict[str, object] = {}
 
         for kvp in json_data:
-            flattened_data[f"{prefix}_{kvp.get("varid")}"] = kvp.get("varvalue")
+            flattened_data[f"{prefix}_{kvp.get('varid')}"] = kvp.get("varvalue")
 
         return flattened_data
