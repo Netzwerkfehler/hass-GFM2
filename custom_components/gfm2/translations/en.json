@@ -2,7 +2,7 @@
     "config": {
         "step": {
             "user": {
-                "description": "If you need help with the configuration have a look here: https://github.com/Netzwerkfehler/hass-GFM2",
+                "description": "If you need help with the configuration, check the documentation on GitHub",
                 "data": {
                     "username": "Username",
                     "password": "Password"
