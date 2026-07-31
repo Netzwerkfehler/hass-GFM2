@@ -1,0 +1,5 @@
+[
+  {"vartype":"comment","varid":"_fixture_note","varvalue":"Structure inferred from gfm2.py, no recorded device response exists for this endpoint"},
+  {"vartype":"value","varid":"reboot_date","varvalue":"01.07.2026"},
+  {"vartype":"value","varid":"reboot_time","varvalue":"04:30"}
+]

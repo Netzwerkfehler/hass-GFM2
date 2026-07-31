@@ -1,0 +1,6 @@
+[
+  {"vartype":"comment","varid":"_fixture_note","varvalue":"Structure inferred from gfm2.py, no recorded device response exists for this endpoint"},
+  {"vartype":"value","varid":"firmware_version","varvalue":"090144.1.0.001"},
+  {"vartype":"value","varid":"firmware_date","varvalue":"2025-11-20 08:15:30"},
+  {"vartype":"value","varid":"autofw_active","varvalue":"1"}
+]
