@@ -82,6 +82,19 @@ async def test_unparseable_power_is_not_reported_as_a_fiber_connection():
     assert data["status_rxpower"] is None
 
 
+async def test_non_finite_power_is_treated_as_unknown():
+    """NaN and infinity parse as floats but must never reach a sensor state."""
+    status = [
+        {"vartype": "value", "varid": "txpower", "varvalue": "NaN"},
+        {"vartype": "value", "varid": "rxpower", "varvalue": "-20"},
+    ]
+    device = Gfm2(StubApi(status=status), time_zone=BERLIN)
+    data = await device.get_status_data()
+    assert data["custom_fiber_connection"] is False
+    assert data["status_txpower"] is None
+    assert data["status_rxpower"] == -20.0
+
+
 async def test_hardware_state_zero_is_fault():
     device = Gfm2(
         StubApi(status=load_json_fixture("status_hw_fault.json")), time_zone=BERLIN

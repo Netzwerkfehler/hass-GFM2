@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from datetime import datetime, tzinfo
 from typing import TYPE_CHECKING
 
@@ -36,12 +37,15 @@ def _to_float(value: object) -> float | None:
     """
     Convert a value to a float.
 
-    Return None when the value is not numeric.
+    Return None when the value is not a finite number. "NaN" and "Infinity"
+    parse happily but would travel on into sensor states and long-term
+    statistics, so they count as no reading at all.
     """
     try:
-        return float(str(value))
+        number = float(str(value))
     except (TypeError, ValueError):
         return None
+    return number if math.isfinite(number) else None
 
 
 class Gfm2:
