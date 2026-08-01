@@ -61,14 +61,6 @@ async def async_setup_entry(
     return True
 
 
-async def async_reload_entry(
-    hass: HomeAssistant,
-    entry: Gfm2ConfigEntry,
-) -> None:
-    """Reload config entry."""
-    await hass.config_entries.async_reload(entry.entry_id)
-
-
 async def async_unload_entry(
     hass: HomeAssistant,
     entry: Gfm2ConfigEntry,

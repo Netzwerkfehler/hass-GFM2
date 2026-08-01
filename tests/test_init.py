@@ -1,12 +1,9 @@
 """Tests for integration setup and unload."""
 
-from unittest.mock import AsyncMock, patch
-
 from homeassistant.config_entries import ConfigEntryState
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
 
-from custom_components.gfm2 import async_reload_entry
 from custom_components.gfm2.const import DOMAIN
 
 from .conftest import TEST_SERIAL
@@ -35,27 +32,6 @@ async def test_unload_entry(hass, config_entry, mock_api):
     assert await hass.config_entries.async_unload(config_entry.entry_id)
     await hass.async_block_till_done()
     assert config_entry.state is ConfigEntryState.NOT_LOADED
-
-
-async def test_reload_entry_uses_home_assistant_api(hass, config_entry):
-    with (
-        patch(
-            "custom_components.gfm2.async_unload_entry",
-            new=AsyncMock(return_value=True),
-        ),
-        patch(
-            "custom_components.gfm2.async_setup_entry",
-            new=AsyncMock(return_value=True),
-        ),
-        patch.object(
-            hass.config_entries,
-            "async_reload",
-            new=AsyncMock(return_value=True),
-        ) as async_reload,
-    ):
-        await async_reload_entry(hass, config_entry)
-
-    async_reload.assert_awaited_once_with(config_entry.entry_id)
 
 
 async def test_setup_adopts_the_serial_number_as_unique_id(
