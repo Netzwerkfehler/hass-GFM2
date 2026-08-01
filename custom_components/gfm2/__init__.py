@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING
 from homeassistant.const import CONF_IP_ADDRESS, Platform
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.loader import async_get_loaded_integration
+from homeassistant.util import dt as dt_util
 
 from custom_components.gfm2.gfm2 import Gfm2
 
@@ -43,7 +44,8 @@ async def async_setup_entry(
             Gfm2ApiClient(
                 ip_address=entry.data[CONF_IP_ADDRESS],
                 session=async_get_clientsession(hass),
-            )
+            ),
+            time_zone=dt_util.get_default_time_zone(),
         ),
         integration=async_get_loaded_integration(hass, entry.domain),
         coordinator=coordinator,

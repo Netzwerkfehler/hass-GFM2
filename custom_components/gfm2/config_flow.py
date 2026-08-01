@@ -7,6 +7,7 @@ from homeassistant import config_entries, data_entry_flow
 from homeassistant.const import CONF_IP_ADDRESS
 from homeassistant.helpers import selector
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
+from homeassistant.util import dt as dt_util
 
 from custom_components.gfm2.gfm2 import Gfm2
 
@@ -69,6 +70,7 @@ class Gfm2FlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             Gfm2ApiClient(
                 ip_address=ip_address,
                 session=async_create_clientsession(self.hass),
-            )
+            ),
+            time_zone=dt_util.get_default_time_zone(),
         )
         await device.test()

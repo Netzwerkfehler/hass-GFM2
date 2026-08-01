@@ -1,17 +1,21 @@
 """Module that abstracts some device API's."""
 
-from datetime import datetime
-from zoneinfo import ZoneInfo
+from __future__ import annotations
 
-from .api import Gfm2ApiClient
+from datetime import datetime, tzinfo
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .api import Gfm2ApiClient
 
 
 class Gfm2:
     """Class the abstracts some device API's."""
 
-    def __init__(self, api: Gfm2ApiClient) -> None:
+    def __init__(self, api: Gfm2ApiClient, time_zone: tzinfo) -> None:
         """Init."""
         self._api: Gfm2ApiClient = api
+        self._time_zone = time_zone
         self._all_data: dict[str, object] = {}
 
     async def get_all_data(self) -> dict[str, object]:
@@ -48,7 +52,7 @@ class Gfm2:
         data = Gfm2.process_json(await self._api.async_get_firmware_data(), "firmware")
         data["firmware_firmware_date"] = datetime.strptime(
             str(data["firmware_firmware_date"]), "%Y-%m-%d %H:%M:%S"
-        ).replace(tzinfo=ZoneInfo("UTC"))
+        ).replace(tzinfo=self._time_zone)
         return data
 
     async def get_reboot_data(self) -> dict[str, object]:
@@ -57,7 +61,7 @@ class Gfm2:
         data["custom_last_reboot"] = datetime.strptime(
             f"{data['reboot_reboot_date']} {data['reboot_reboot_time']}",
             "%d.%m.%Y %H:%M",
-        ).replace(tzinfo=ZoneInfo("UTC"))
+        ).replace(tzinfo=self._time_zone)
         return data
 
     async def reboot(self) -> None:
