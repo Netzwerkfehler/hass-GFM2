@@ -18,8 +18,11 @@ from .const import DOMAIN
 from .entity import Gfm2Entity
 
 if TYPE_CHECKING:
+    from datetime import datetime
+
     from homeassistant.core import HomeAssistant
     from homeassistant.helpers.entity_platform import AddEntitiesCallback
+    from homeassistant.helpers.typing import StateType
 
     from .coordinator import Gfm2DataUpdateCoordinator
     from .data import Gfm2ConfigEntry
@@ -27,14 +30,14 @@ if TYPE_CHECKING:
 ENTITY_DESCRIPTIONS = (
     SensorEntityDescription(
         key="status_txpackets",
-        name="LAN Packets Sent",
+        translation_key="lan_packets_sent",
         icon="mdi:package-up",
         state_class=SensorStateClass.TOTAL_INCREASING,
         native_unit_of_measurement="Packets",
     ),
     SensorEntityDescription(
         key="status_txbytes",
-        name="LAN Data Sent",
+        translation_key="lan_data_sent",
         icon="mdi:upload",
         device_class=SensorDeviceClass.DATA_SIZE,
         state_class=SensorStateClass.TOTAL_INCREASING,
@@ -42,14 +45,14 @@ ENTITY_DESCRIPTIONS = (
     ),
     SensorEntityDescription(
         key="status_rxpackets",
-        name="LAN Packets Received",
+        translation_key="lan_packets_received",
         icon="mdi:package-down",
         state_class=SensorStateClass.TOTAL_INCREASING,
         native_unit_of_measurement="Packets",
     ),
     SensorEntityDescription(
         key="status_rxbytes",
-        name="LAN Data Received",
+        translation_key="lan_data_received",
         icon="mdi:download",
         device_class=SensorDeviceClass.DATA_SIZE,
         state_class=SensorStateClass.TOTAL_INCREASING,
@@ -57,14 +60,14 @@ ENTITY_DESCRIPTIONS = (
     ),
     SensorEntityDescription(
         key="status_rxdrop_packets",
-        name="LAN Dropped Packets",
+        translation_key="lan_dropped_packets",
         icon="mdi:package-variant-closed-minus",
         state_class=SensorStateClass.TOTAL_INCREASING,
         native_unit_of_measurement="Packets",
     ),
     SensorEntityDescription(
         key="status_link_status",
-        name="LAN Link",
+        translation_key="lan_link",
         icon="mdi:download",
         device_class=SensorDeviceClass.DATA_RATE,
         state_class=SensorStateClass.MEASUREMENT,
@@ -72,7 +75,7 @@ ENTITY_DESCRIPTIONS = (
     ),
     SensorEntityDescription(
         key="status_stability",
-        name="LAN Link Uptime",
+        translation_key="lan_link_uptime",
         icon="mdi:check-network",
         device_class=SensorDeviceClass.DURATION,
         state_class=SensorStateClass.TOTAL_INCREASING,
@@ -81,7 +84,7 @@ ENTITY_DESCRIPTIONS = (
     ),
     SensorEntityDescription(
         key="status_txpower",
-        name="PON Tx Power",
+        translation_key="pon_tx_power",
         icon="mdi:upload-network",
         device_class=SensorDeviceClass.SIGNAL_STRENGTH,
         state_class=SensorStateClass.MEASUREMENT,
@@ -89,7 +92,7 @@ ENTITY_DESCRIPTIONS = (
     ),
     SensorEntityDescription(
         key="status_rxpower",
-        name="PON Rx Power",
+        translation_key="pon_rx_power",
         icon="mdi:download-network",
         device_class=SensorDeviceClass.SIGNAL_STRENGTH,
         state_class=SensorStateClass.MEASUREMENT,
@@ -97,29 +100,29 @@ ENTITY_DESCRIPTIONS = (
     ),
     SensorEntityDescription(
         key="status_rxbip_crc",
-        name="PON RxBiP / CRC",
+        translation_key="pon_rxbip_crc",
         icon="mdi:timeline-alert",
         state_class=SensorStateClass.MEASUREMENT,
     ),
     SensorEntityDescription(
         key="status_ui_version",
-        name="UI Version",
+        translation_key="ui_version",
         icon="mdi:web",
     ),
     SensorEntityDescription(
         key="firmware_firmware_version",
-        name="Firmware Version",
+        translation_key="firmware_version",
         icon="mdi:chip",
     ),
     SensorEntityDescription(
         key="firmware_firmware_date",
-        name="Firmware Date",
+        translation_key="firmware_date",
         icon="mdi:calendar",
         device_class=SensorDeviceClass.TIMESTAMP,
     ),
     SensorEntityDescription(
         key="custom_last_reboot",
-        name="Last Reboot",
+        translation_key="last_reboot",
         icon="mdi:history",
         device_class=SensorDeviceClass.TIMESTAMP,
     ),
@@ -144,6 +147,8 @@ async def async_setup_entry(
 class Gfm2Sensor(Gfm2Entity, SensorEntity):
     """GFM2 Sensor class."""
 
+    _attr_has_entity_name = True
+
     def __init__(
         self,
         coordinator: Gfm2DataUpdateCoordinator,
@@ -152,10 +157,9 @@ class Gfm2Sensor(Gfm2Entity, SensorEntity):
         """Initialize the sensor class."""
         super().__init__(coordinator)
         self.entity_description = entity_description
-        self._attr_name = f"{self.coordinator.config_entry.runtime_data.device.device_name} {entity_description.name}"  # noqa: E501
         self._attr_unique_id = f"{DOMAIN}_{coordinator.config_entry.data[CONF_IP_ADDRESS]}_{entity_description.key}"  # noqa: E501
 
     @property
-    def native_value(self) -> str | None:
+    def native_value(self) -> StateType | datetime:
         """Return the native value of the sensor."""
         return self.coordinator.data.get(self.entity_description.key)

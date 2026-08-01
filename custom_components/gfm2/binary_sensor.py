@@ -24,16 +24,16 @@ if TYPE_CHECKING:
 ENTITY_DESCRIPTIONS = (
     BinarySensorEntityDescription(
         key="status_hardware_state",
-        name="Hardware Status",
+        translation_key="hardware_status",
         device_class=BinarySensorDeviceClass.PROBLEM,
     ),
     BinarySensorEntityDescription(
         key="firmware_autofw_active",
-        name="Automatic Firmware Updates",
+        translation_key="automatic_firmware_updates",
     ),
     BinarySensorEntityDescription(
         key="custom_fiber_connection",
-        name="Fiber Connection",
+        translation_key="fiber_connection",
         device_class=BinarySensorDeviceClass.CONNECTIVITY,
     ),
 )
@@ -57,6 +57,8 @@ async def async_setup_entry(
 class Gfm2BinarySensor(Gfm2Entity, BinarySensorEntity):
     """GFM2 binary_sensor class."""
 
+    _attr_has_entity_name = True
+
     def __init__(
         self,
         coordinator: Gfm2DataUpdateCoordinator,
@@ -65,7 +67,6 @@ class Gfm2BinarySensor(Gfm2Entity, BinarySensorEntity):
         """Initialize the binary_sensor class."""
         super().__init__(coordinator)
         self.entity_description = entity_description
-        self._attr_name = f"{self.coordinator.config_entry.runtime_data.device.device_name} {entity_description.name}"  # noqa: E501
         self._attr_unique_id = f"{DOMAIN}_{coordinator.config_entry.data[CONF_IP_ADDRESS]}_{entity_description.key}"  # noqa: E501
 
     @property

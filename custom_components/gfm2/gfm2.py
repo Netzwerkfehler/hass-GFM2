@@ -8,6 +8,41 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from .api import Gfm2ApiClient
 
+_INT_KEYS = (
+    "status_txpackets",
+    "status_txbytes",
+    "status_rxpackets",
+    "status_rxbytes",
+    "status_rxdrop_packets",
+    "status_stability",
+    "status_rxbip_crc",
+)
+_FLOAT_KEYS = ("status_txpower", "status_rxpower")
+
+
+def _to_int(value: object) -> int | None:
+    """
+    Convert a value to an integer.
+
+    Return None when the value is not numeric.
+    """
+    try:
+        return int(str(value))
+    except (TypeError, ValueError):
+        return None
+
+
+def _to_float(value: object) -> float | None:
+    """
+    Convert a value to a float.
+
+    Return None when the value is not numeric.
+    """
+    try:
+        return float(str(value))
+    except (TypeError, ValueError):
+        return None
+
 
 class Gfm2:
     """Class the abstracts some device API's."""
@@ -47,6 +82,11 @@ class Gfm2:
         # Firmware 2020 incorrectly reports "0" for a live 2.5G LAN link.
         if data.get("status_link_status") == "0":
             data["status_link_status"] = None
+
+        for key in _INT_KEYS:
+            data[key] = _to_int(data.get(key))
+        for key in _FLOAT_KEYS:
+            data[key] = _to_float(data.get(key))
 
         return data
 

@@ -42,12 +42,12 @@ async def async_setup_entry(
 class Gfm2RebootButton(ButtonEntity, Gfm2Entity):
     """Reboot button."""
 
+    _attr_has_entity_name = True
+    _attr_translation_key = "restart"
+
     def __init__(self, coordinator: Gfm2DataUpdateCoordinator) -> None:
         """Initialize the button entity."""
         super().__init__(coordinator)
-        self._attr_name = (
-            f"{self.coordinator.config_entry.runtime_data.device.device_name} Restart"
-        )
         self._attr_unique_id = (
             f"{DOMAIN}_{coordinator.config_entry.data[CONF_IP_ADDRESS]}_reboot_restart"
         )
