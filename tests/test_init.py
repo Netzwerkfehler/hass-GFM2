@@ -58,6 +58,19 @@ async def test_reload_entry_uses_home_assistant_api(hass, config_entry):
     async_reload.assert_awaited_once_with(config_entry.entry_id)
 
 
+async def test_setup_adopts_the_serial_number_as_unique_id(
+    hass, config_entry, mock_api
+):
+    """An entry from before the serial number was claimed must adopt it."""
+    config_entry.add_to_hass(hass)
+    assert config_entry.unique_id is None
+
+    assert await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    assert config_entry.unique_id == TEST_SERIAL
+
+
 async def test_device_identity_migrates_without_creating_a_second_device(
     hass, config_entry, mock_api, device_registry
 ):
