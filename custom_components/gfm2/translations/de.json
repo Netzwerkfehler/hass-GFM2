@@ -1,0 +1,45 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "description": "Hilfe zur Konfiguration findest du in der Dokumentation auf GitHub.",
+        "data": {
+          "ip_address": "IP-Adresse"
+        }
+      }
+    },
+    "error": {
+      "connection": "Verbindung zum Modem nicht möglich.",
+      "unknown": "Unbekannter Fehler aufgetreten."
+    },
+    "abort": {
+      "already_configured": "Dieses Modem ist bereits konfiguriert."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "lan_packets_sent": { "name": "LAN Pakete gesendet" },
+      "lan_data_sent": { "name": "LAN Daten gesendet" },
+      "lan_packets_received": { "name": "LAN Pakete empfangen" },
+      "lan_data_received": { "name": "LAN Daten empfangen" },
+      "lan_dropped_packets": { "name": "LAN Verworfene Pakete" },
+      "lan_link": { "name": "LAN Link" },
+      "lan_link_uptime": { "name": "LAN Link-Laufzeit" },
+      "pon_tx_power": { "name": "PON Sendeleistung" },
+      "pon_rx_power": { "name": "PON Empfangsleistung" },
+      "pon_rxbip_crc": { "name": "PON RxBiP / CRC" },
+      "ui_version": { "name": "UI-Version" },
+      "firmware_version": { "name": "Firmware-Version" },
+      "firmware_date": { "name": "Firmware-Datum" },
+      "last_reboot": { "name": "Letzter Neustart" }
+    },
+    "binary_sensor": {
+      "hardware_status": { "name": "Hardware-Status" },
+      "automatic_firmware_updates": { "name": "Automatische Firmware-Updates" },
+      "fiber_connection": { "name": "Glasfaserverbindung" }
+    },
+    "button": {
+      "restart": { "name": "Neustart" }
+    }
+  }
+}
