@@ -6,10 +6,8 @@ import voluptuous as vol
 from homeassistant import config_entries, data_entry_flow
 from homeassistant.const import CONF_IP_ADDRESS
 from homeassistant.helpers import selector
-from homeassistant.helpers.aiohttp_client import async_create_clientsession
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.util import dt as dt_util
-
-from custom_components.gfm2.gfm2 import Gfm2
 
 from .api import (
     Gfm2ApiClient,
@@ -17,6 +15,7 @@ from .api import (
     Gfm2ApiClientError,
 )
 from .const import DOMAIN, LOGGER
+from .gfm2 import Gfm2
 
 
 class Gfm2FlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
@@ -32,7 +31,9 @@ class Gfm2FlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         _errors = {}
         if user_input is not None:
             try:
-                await self._test_connection(ip_address=user_input[CONF_IP_ADDRESS])
+                status = await self._get_status_data(
+                    ip_address=user_input[CONF_IP_ADDRESS]
+                )
             except Gfm2ApiClientCommunicationError as exception:
                 LOGGER.error(exception)
                 _errors["base"] = "connection"
@@ -40,8 +41,13 @@ class Gfm2FlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                 LOGGER.exception(exception)
                 _errors["base"] = "unknown"
             else:
+                serial_number = status.get("status_serial_number")
+                if serial_number:
+                    await self.async_set_unique_id(str(serial_number))
+                    self._abort_if_unique_id_configured()
+                device_name = status.get("status_device_name") or "Glasfaser-Modem 2"
                 return self.async_create_entry(
-                    title=user_input[CONF_IP_ADDRESS],
+                    title=f"{device_name} ({user_input[CONF_IP_ADDRESS]})",
                     data=user_input,
                 )
 
@@ -64,13 +70,13 @@ class Gfm2FlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             errors=_errors,
         )
 
-    async def _test_connection(self, ip_address: str) -> None:
-        """Check the connection."""
+    async def _get_status_data(self, ip_address: str) -> dict[str, object]:
+        """Check the connection and return the status payload."""
         device = Gfm2(
             Gfm2ApiClient(
                 ip_address=ip_address,
-                session=async_create_clientsession(self.hass),
+                session=async_get_clientsession(self.hass),
             ),
             time_zone=dt_util.get_default_time_zone(),
         )
-        await device.test()
+        return await device.get_status_data()

@@ -16,18 +16,22 @@ class Gfm2Entity(CoordinatorEntity[Gfm2DataUpdateCoordinator]):
         """Initialize."""
         super().__init__(coordinator)
 
+        device = coordinator.config_entry.runtime_data.device
+        serial_number = device.serial_number
         self._attr_device_info = DeviceInfo(
             identifiers={
                 (
                     coordinator.config_entry.domain,
-                    coordinator.config_entry.entry_id,
+                    serial_number or coordinator.config_entry.entry_id,
                 ),
             },
             manufacturer="Telekom (OEM: Sercomm)",
+            # The hardware revision is only "V1" and already appears below.
+            # Keep the more useful Sercomm model identifier here.
             model="FG1000B.11",
-            serial_number=coordinator.config_entry.runtime_data.device.serial_number,
-            name=coordinator.config_entry.runtime_data.device.device_name,
-            hw_version=coordinator.config_entry.runtime_data.device.hardware_revision,
-            sw_version=f"{coordinator.config_entry.runtime_data.device.firmware_version} / UI: {coordinator.config_entry.runtime_data.device.ui_version}",  # noqa: E501
+            serial_number=serial_number,
+            name=device.device_name,
+            hw_version=device.hardware_revision,
+            sw_version=f"{device.firmware_version} / UI: {device.ui_version}",
             configuration_url=f"http://{coordinator.config_entry.data[CONF_IP_ADDRESS]}/ONT/client/html/content/overview/index.html",
         )
