@@ -78,9 +78,7 @@ class Gfm2:
         data["status_txpower"] = txpower
         data["status_rxpower"] = rxpower
 
-        # The 2020 firmware reports the negotiated speed in Mbit/s, but only up
-        # to 1000. Faster links read "0" instead; measured at 2.5G and at 5G,
-        # while a 1G link reports "1000".
+        # Firmware 2020 incorrectly reports "0" for a live 2.5G LAN link.
         if data.get("status_link_status") == "0":
             data["status_link_status"] = None
 
