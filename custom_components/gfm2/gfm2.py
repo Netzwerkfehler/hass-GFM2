@@ -31,38 +31,48 @@ class Gfm2:
         """Read data from the status.json endpoint."""
         data = Gfm2.process_json(await self._api.async_get_status_data(), "status")
 
-        # invert value
-        data["status_hardware_state"] = data["status_hardware_state"] != "1"
+        # "0" means hardware fault; any other value (including absent) is OK.
+        data["status_hardware_state"] = data.get("status_hardware_state") == "0"
 
-        # custom value to for fiber link; rx and tx become "--" when disconnected
-        data["custom_fiber_connection"] = (
-            data["status_txpower"] != "--" and data["status_rxpower"] != "--"
-        )
+        # rx and tx power become "--" when the fiber link is down
+        txpower = data.get("status_txpower")
+        rxpower = data.get("status_rxpower")
+        data["custom_fiber_connection"] = txpower not in (
+            None,
+            "--",
+        ) and rxpower not in (None, "--")
+        data["status_txpower"] = None if txpower == "--" else txpower
+        data["status_rxpower"] = None if rxpower == "--" else rxpower
 
-        if data["status_txpower"] == "--":
-            data["status_txpower"] = None
-
-        if data["status_rxpower"] == "--":
-            data["status_rxpower"] = None
+        # link_status is NOT a data rate: a live 2.5G link still reports "0".
+        if data.get("status_link_status") == "0":
+            data["status_link_status"] = None
 
         return data
 
     async def get_firmware_data(self) -> dict[str, object]:
         """Read data from the firmware.json endpoint."""
         data = Gfm2.process_json(await self._api.async_get_firmware_data(), "firmware")
-        data["firmware_firmware_date"] = datetime.strptime(
-            str(data["firmware_firmware_date"]), "%Y-%m-%d %H:%M:%S"
-        ).replace(tzinfo=self._time_zone)
+        data["firmware_firmware_date"] = self._parse_device_datetime(
+            str(data.get("firmware_firmware_date")), "%Y-%m-%d %H:%M:%S"
+        )
         return data
 
     async def get_reboot_data(self) -> dict[str, object]:
         """Read data from the reboot.json endpoint."""
         data = Gfm2.process_json(await self._api.async_get_reboot_data(), "reboot")
-        data["custom_last_reboot"] = datetime.strptime(
-            f"{data['reboot_reboot_date']} {data['reboot_reboot_time']}",
+        data["custom_last_reboot"] = self._parse_device_datetime(
+            f"{data.get('reboot_reboot_date')} {data.get('reboot_reboot_time')}",
             "%d.%m.%Y %H:%M",
-        ).replace(tzinfo=self._time_zone)
+        )
         return data
+
+    def _parse_device_datetime(self, raw: str, fmt: str) -> datetime | None:
+        """Parse a device timestamp in the configured time zone, None on failure."""
+        try:
+            return datetime.strptime(raw, fmt).replace(tzinfo=self._time_zone)
+        except ValueError:
+            return None
 
     async def reboot(self) -> None:
         """Reboots the modem."""
@@ -77,36 +87,47 @@ class Gfm2:
         return self._all_data
 
     @property
-    def serial_number(self) -> str:
+    def serial_number(self) -> str | None:
         """Returns the serial number."""
-        return str(self._all_data["status_serial_number"])
+        value = self._all_data.get("status_serial_number")
+        return None if value is None else str(value)
 
     @property
-    def device_name(self) -> str:
+    def device_name(self) -> str | None:
         """Returns the device name."""
-        return str(self._all_data["status_device_name"])
+        value = self._all_data.get("status_device_name")
+        return None if value is None else str(value)
 
     @property
-    def hardware_revision(self) -> str:
+    def hardware_revision(self) -> str | None:
         """Returns the hardare revision."""
-        return str(self._all_data["status_hardware_revision"])
+        value = self._all_data.get("status_hardware_revision")
+        return None if value is None else str(value)
 
     @property
-    def ui_version(self) -> str:
+    def ui_version(self) -> str | None:
         """Returns the UI version."""
-        return str(self._all_data["status_ui_version"])
+        value = self._all_data.get("status_ui_version")
+        return None if value is None else str(value)
 
     @property
-    def firmware_version(self) -> str:
+    def firmware_version(self) -> str | None:
         """Returns the firmware version."""
-        return str(self._all_data["firmware_firmware_version"])
+        value = self._all_data.get("firmware_firmware_version")
+        return None if value is None else str(value)
 
     @staticmethod
-    def process_json(json_data, prefix: str) -> dict[str, object]:  # noqa: ANN001
-        """Flattens the given json structure."""
+    def process_json(json_data: object, prefix: str) -> dict[str, object]:
+        """Flattens the given json structure, tolerating malformed input."""
         flattened_data: dict[str, object] = {}
-
+        if not isinstance(json_data, list):
+            return flattened_data
         for kvp in json_data:
-            flattened_data[f"{prefix}_{kvp.get('varid')}"] = kvp.get("varvalue")
+            if not isinstance(kvp, dict):
+                continue
+            varid = kvp.get("varid")
+            if not varid:
+                continue
+            flattened_data[f"{prefix}_{varid}"] = kvp.get("varvalue")
 
         return flattened_data

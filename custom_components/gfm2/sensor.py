@@ -9,7 +9,6 @@ from homeassistant.components.sensor.const import SensorDeviceClass, SensorState
 from homeassistant.const import (
     CONF_IP_ADDRESS,
     SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
-    UnitOfDataRate,
     UnitOfInformation,
     UnitOfTime,
 )
@@ -66,9 +65,6 @@ ENTITY_DESCRIPTIONS = (
         key="status_link_status",
         name="LAN Link",
         icon="mdi:download",
-        device_class=SensorDeviceClass.DATA_RATE,
-        state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement=UnitOfDataRate.MEGABITS_PER_SECOND,
     ),
     SensorEntityDescription(
         key="status_stability",

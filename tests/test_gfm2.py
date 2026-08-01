@@ -44,3 +44,48 @@ async def test_firmware_timestamp_uses_configured_time_zone():
         2025, 11, 20, 8, 15, 30, tzinfo=BERLIN
     )
     assert data["firmware_firmware_date"].utcoffset() == timedelta(hours=1)  # CET
+
+
+async def test_incomplete_status_does_not_raise():
+    device = Gfm2(
+        StubApi(status=load_json_fixture("status_incomplete.json")), time_zone=BERLIN
+    )
+    data = await device.get_status_data()
+    assert data["custom_fiber_connection"] is False
+    assert data["status_hardware_state"] is False  # kein Befund ohne Daten
+    assert data.get("status_txpower") is None
+
+
+async def test_malformed_payload_does_not_raise():
+    device = Gfm2(
+        StubApi(status={"unexpected": "shape"}, firmware="no list", reboot=None),
+        time_zone=BERLIN,
+    )
+    status = await device.get_status_data()
+    firmware = await device.get_firmware_data()
+    reboot = await device.get_reboot_data()
+    assert status["custom_fiber_connection"] is False
+    assert firmware["firmware_firmware_date"] is None
+    assert reboot["custom_last_reboot"] is None
+
+
+async def test_hardware_state_zero_is_fault():
+    device = Gfm2(
+        StubApi(status=load_json_fixture("status_hw_fault.json")), time_zone=BERLIN
+    )
+    data = await device.get_status_data()
+    assert data["status_hardware_state"] is True  # True == Problem
+
+
+async def test_hardware_state_unexpected_value_is_ok():
+    status = [{"vartype": "value", "varid": "hardware_state", "varvalue": "2"}]
+    device = Gfm2(StubApi(status=status), time_zone=BERLIN)
+    data = await device.get_status_data()
+    assert data["status_hardware_state"] is False
+
+
+async def test_properties_return_none_when_data_missing():
+    device = Gfm2(StubApi(), time_zone=BERLIN)
+    await device.get_all_data()
+    assert device.serial_number is None
+    assert device.device_name is None

@@ -2,6 +2,7 @@
 
 from datetime import UTC, datetime
 
+from homeassistant.const import STATE_UNKNOWN
 from homeassistant.util import dt as dt_util
 
 
@@ -25,3 +26,15 @@ async def test_last_reboot_is_read_as_device_local_time(hass, config_entry, mock
     assert dt_util.parse_datetime(state.state) == datetime(
         2026, 7, 1, 2, 30, tzinfo=UTC
     )
+
+
+async def test_link_status_zero_reports_unknown(hass, config_entry, mock_api):
+    config_entry.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    state = hass.states.get("sensor.glasfaser_modem_2_lan_link")
+    assert state.state == STATE_UNKNOWN
+    assert "unit_of_measurement" not in state.attributes
+    assert "device_class" not in state.attributes
+    assert "state_class" not in state.attributes
