@@ -69,15 +69,14 @@ class Gfm2:
         # "0" means hardware fault; any other value (including absent) is OK.
         data["status_hardware_state"] = data.get("status_hardware_state") == "0"
 
-        # rx and tx power become "--" when the fiber link is down
-        txpower = data.get("status_txpower")
-        rxpower = data.get("status_rxpower")
-        data["custom_fiber_connection"] = txpower not in (
-            None,
-            "--",
-        ) and rxpower not in (None, "--")
-        data["status_txpower"] = None if txpower == "--" else txpower
-        data["status_rxpower"] = None if rxpower == "--" else rxpower
+        # rx and tx power become "--" when the fiber link is down. Deriving the
+        # link state from the parsed numbers keeps it consistent with the two
+        # power sensors: anything that is not a number leaves all three unknown.
+        txpower = _to_float(data.get("status_txpower"))
+        rxpower = _to_float(data.get("status_rxpower"))
+        data["custom_fiber_connection"] = txpower is not None and rxpower is not None
+        data["status_txpower"] = txpower
+        data["status_rxpower"] = rxpower
 
         # Firmware 2020 incorrectly reports "0" for a live 2.5G LAN link.
         if data.get("status_link_status") == "0":

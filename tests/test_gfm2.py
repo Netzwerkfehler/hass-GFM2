@@ -69,6 +69,19 @@ async def test_malformed_payload_does_not_raise():
     assert reboot["custom_last_reboot"] is None
 
 
+async def test_unparseable_power_is_not_reported_as_a_fiber_connection():
+    """A non-numeric power value other than "--" must not count as a live link."""
+    status = [
+        {"vartype": "value", "varid": "txpower", "varvalue": ""},
+        {"vartype": "value", "varid": "rxpower", "varvalue": "n/a"},
+    ]
+    device = Gfm2(StubApi(status=status), time_zone=BERLIN)
+    data = await device.get_status_data()
+    assert data["custom_fiber_connection"] is False
+    assert data["status_txpower"] is None
+    assert data["status_rxpower"] is None
+
+
 async def test_hardware_state_zero_is_fault():
     device = Gfm2(
         StubApi(status=load_json_fixture("status_hw_fault.json")), time_zone=BERLIN
