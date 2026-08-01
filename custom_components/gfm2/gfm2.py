@@ -44,7 +44,7 @@ class Gfm2:
         data["status_txpower"] = None if txpower == "--" else txpower
         data["status_rxpower"] = None if rxpower == "--" else rxpower
 
-        # link_status is NOT a data rate: a live 2.5G link still reports "0".
+        # Firmware 2020 incorrectly reports "0" for a live 2.5G LAN link.
         if data.get("status_link_status") == "0":
             data["status_link_status"] = None
 

@@ -17,8 +17,8 @@ _Home Assistant community integration to integrate with the [Telekom Glasfaser-M
 - Packets Received
 - Dropped Packets
 - Link Uptime
-- Link
-    - Note: The modem does not report the actual link speed. The raw value is exposed without a unit and reads "unknown" while the device reports 0.
+- Link Speed
+    - Note: Reports the negotiated LAN speed in Mbit/s. Firmware 2020 incorrectly reports 0 for a 2.5G connection, which is shown as "unknown" instead.
 
 ### PON
 - Rx Power

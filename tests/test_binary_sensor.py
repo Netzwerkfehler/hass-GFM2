@@ -30,7 +30,7 @@ async def test_hardware_fault_and_no_link(hass, config_entry, mock_api):
 
 
 async def test_no_link_turns_fiber_connection_off(hass, config_entry, mock_api):
-    mock_api["status"].return_value = load_json_fixture("status_no_link.json")
+    mock_api["status"].return_value = load_json_fixture("status_no_link_real.json")
     await _setup(hass, config_entry)
     assert (
         hass.states.get("binary_sensor.glasfaser_modem_2_fiber_connection").state

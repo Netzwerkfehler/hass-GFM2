@@ -31,8 +31,8 @@ class StubApi:
 async def test_reboot_timestamp_uses_configured_time_zone():
     device = Gfm2(StubApi(reboot=load_json_fixture("reboot.json")), time_zone=BERLIN)
     data = await device.get_reboot_data()
-    assert data["custom_last_reboot"] == datetime(2026, 7, 1, 4, 30, tzinfo=BERLIN)
-    assert data["custom_last_reboot"].utcoffset() == timedelta(hours=2)  # CEST
+    assert data["custom_last_reboot"] == datetime(2025, 12, 3, 22, 48, tzinfo=BERLIN)
+    assert data["custom_last_reboot"].utcoffset() == timedelta(hours=1)  # CET
 
 
 async def test_firmware_timestamp_uses_configured_time_zone():
@@ -41,9 +41,9 @@ async def test_firmware_timestamp_uses_configured_time_zone():
     )
     data = await device.get_firmware_data()
     assert data["firmware_firmware_date"] == datetime(
-        2025, 11, 20, 8, 15, 30, tzinfo=BERLIN
+        2020, 9, 21, 10, 4, 48, tzinfo=BERLIN
     )
-    assert data["firmware_firmware_date"].utcoffset() == timedelta(hours=1)  # CET
+    assert data["firmware_firmware_date"].utcoffset() == timedelta(hours=2)  # CEST
 
 
 async def test_incomplete_status_does_not_raise():
