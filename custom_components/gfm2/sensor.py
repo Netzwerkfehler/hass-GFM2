@@ -81,6 +81,8 @@ ENTITY_DESCRIPTIONS = (
         state_class=SensorStateClass.TOTAL_INCREASING,
         native_unit_of_measurement=UnitOfTime.SECONDS,
         suggested_unit_of_measurement=UnitOfTime.DAYS,
+        # Without this, the conversion from seconds leaves 13 decimals on screen.
+        suggested_display_precision=2,
     ),
     SensorEntityDescription(
         key="status_txpower",
