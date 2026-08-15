@@ -3,8 +3,9 @@
 from datetime import UTC, datetime
 from zoneinfo import ZoneInfo
 
+import pytest
 from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
-from homeassistant.const import STATE_UNKNOWN, UnitOfDataRate
+from homeassistant.const import STATE_UNKNOWN, UnitOfDataRate, UnitOfInformation
 from homeassistant.util import dt as dt_util
 
 from custom_components.gfm2.gfm2 import Gfm2
@@ -33,6 +34,18 @@ async def test_last_reboot_is_read_as_device_local_time(hass, config_entry, mock
     assert dt_util.parse_datetime(state.state) == datetime(
         2025, 12, 3, 21, 48, tzinfo=UTC
     )
+
+
+async def test_data_counters_are_shown_in_gigabytes(hass, config_entry, mock_api):
+    # Bytes bleiben die native Einheit und damit die Grundlage der Statistik,
+    # angezeigt wird aber GB. Die Fixture meldet 522995802597 Bytes.
+    config_entry.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    state = hass.states.get("sensor.glasfaser_modem_2_lan_data_received")
+    assert state.attributes["unit_of_measurement"] == UnitOfInformation.GIGABYTES
+    assert float(state.state) == pytest.approx(522.995802597)
 
 
 async def test_link_status_zero_reports_unknown(hass, config_entry, mock_api):

@@ -42,6 +42,9 @@ ENTITY_DESCRIPTIONS = (
         device_class=SensorDeviceClass.DATA_SIZE,
         state_class=SensorStateClass.TOTAL_INCREASING,
         native_unit_of_measurement=UnitOfInformation.BYTES,
+        # Bytes stay native so statistics keep their base. A modem that has
+        # been up for weeks reports thirteen digits, which reads as noise.
+        suggested_unit_of_measurement=UnitOfInformation.GIGABYTES,
     ),
     SensorEntityDescription(
         key="status_rxpackets",
@@ -57,6 +60,9 @@ ENTITY_DESCRIPTIONS = (
         device_class=SensorDeviceClass.DATA_SIZE,
         state_class=SensorStateClass.TOTAL_INCREASING,
         native_unit_of_measurement=UnitOfInformation.BYTES,
+        # Bytes stay native so statistics keep their base. A modem that has
+        # been up for weeks reports thirteen digits, which reads as noise.
+        suggested_unit_of_measurement=UnitOfInformation.GIGABYTES,
     ),
     SensorEntityDescription(
         key="status_rxdrop_packets",
