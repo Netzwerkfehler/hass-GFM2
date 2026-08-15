@@ -1,0 +1,11 @@
+[
+  {"vartype":"value","varid":"device_name","varvalue":"Glasfaser-Modem 2"},
+  {"vartype":"value","varid":"rebooting","varvalue":"0"},
+  {"vartype":"value","varid":"ploam_state","varvalue":"0"},
+  {"vartype":"value","varid":"ploam_success","varvalue":"0"},
+  {"vartype":"value","varid":"save_fails","varvalue":"0"},
+  {"vartype":"value","varid":"service_mode","varvalue":"0"},
+  {"vartype":"page_title","varid":"title","varvalue":"Glasfaser-Modem 2 Konfigurationsprogramm"},
+  {"vartype":"value","varid":"reboot_time","varvalue":""},
+  {"vartype":"value","varid":"reboot_date","varvalue":""}
+]

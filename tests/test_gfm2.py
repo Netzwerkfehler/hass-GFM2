@@ -35,6 +35,16 @@ async def test_reboot_timestamp_uses_configured_time_zone():
     assert data["custom_last_reboot"].utcoffset() == timedelta(hours=1)  # CET
 
 
+async def test_reboot_timestamp_is_none_when_never_rebooted():
+    # Aufzeichnung eines Geraets, das nie ueber den Reboot-Button neu gestartet
+    # wurde: beide Felder sind leer, nicht etwa abwesend.
+    device = Gfm2(
+        StubApi(reboot=load_json_fixture("reboot_never.json")), time_zone=BERLIN
+    )
+    data = await device.get_reboot_data()
+    assert data["custom_last_reboot"] is None
+
+
 async def test_firmware_timestamp_uses_configured_time_zone():
     device = Gfm2(
         StubApi(firmware=load_json_fixture("firmware.json")), time_zone=BERLIN
