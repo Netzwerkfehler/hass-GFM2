@@ -42,6 +42,8 @@ async def test_reboot_timestamp_is_none_when_never_rebooted():
         StubApi(reboot=load_json_fixture("reboot_never.json")), time_zone=BERLIN
     )
     data = await device.get_reboot_data()
+    assert data["reboot_reboot_date"] == ""
+    assert data["reboot_reboot_time"] == ""
     assert data["custom_last_reboot"] is None
 
 
