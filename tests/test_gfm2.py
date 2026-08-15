@@ -127,3 +127,21 @@ async def test_properties_return_none_when_data_missing():
     await device.get_all_data()
     assert device.serial_number is None
     assert device.device_name is None
+
+
+async def test_non_string_serial_number_is_refused():
+    # Die Seriennummer wird dauerhaft als unique_id uebernommen. Ein Ueberrest
+    # einer kaputten Antwort darf dort nicht als Text landen.
+    status = [
+        {"vartype": "value", "varid": "serial_number", "varvalue": {"broken": True}}
+    ]
+    device = Gfm2(StubApi(status=status), time_zone=BERLIN)
+    await device.get_all_data()
+    assert device.serial_number is None
+
+
+async def test_blank_serial_number_is_refused():
+    status = [{"vartype": "value", "varid": "serial_number", "varvalue": "   "}]
+    device = Gfm2(StubApi(status=status), time_zone=BERLIN)
+    await device.get_all_data()
+    assert device.serial_number is None

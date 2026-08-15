@@ -73,9 +73,10 @@ class Gfm2:
         # "0" means hardware fault; any other value (including absent) is OK.
         data["status_hardware_state"] = data.get("status_hardware_state") == "0"
 
-        # rx and tx power become "--" when the fiber link is down. Deriving the
-        # link state from the parsed numbers keeps it consistent with the two
-        # power sensors: anything that is not a number leaves all three unknown.
+        # rx and tx power become "--" when the fiber link is down, which is the
+        # only field on this device that tells a live link from a dead one. The
+        # power sensors turn unknown, and anything that does not parse as a
+        # number counts as no link, including a response that omits the fields.
         txpower = _to_float(data.get("status_txpower"))
         rxpower = _to_float(data.get("status_rxpower"))
         data["custom_fiber_connection"] = txpower is not None and rxpower is not None
@@ -131,9 +132,17 @@ class Gfm2:
 
     @property
     def serial_number(self) -> str | None:
-        """Returns the serial number."""
+        """
+        Returns the serial number.
+
+        The entry and the device are permanently identified by this value, so
+        only a plain, non-empty string counts. Stringifying whatever a broken
+        response left behind would migrate an installation onto that remnant.
+        """
         value = self._all_data.get("status_serial_number")
-        return None if value is None else str(value)
+        if not isinstance(value, str) or not value.strip():
+            return None
+        return value.strip()
 
     @property
     def device_name(self) -> str | None:
