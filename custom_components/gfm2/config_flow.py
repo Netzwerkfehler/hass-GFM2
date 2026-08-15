@@ -30,6 +30,14 @@ class Gfm2FlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         """Handle a flow initialized by the user."""
         _errors = {}
         if user_input is not None:
+            # Entries from before the serial number was claimed carry no unique
+            # ID. A disabled one never runs its setup and never adopts one
+            # either, so the check below cannot see it. Its address can.
+            if any(
+                entry.data.get(CONF_IP_ADDRESS) == user_input[CONF_IP_ADDRESS]
+                for entry in self._async_current_entries()
+            ):
+                return self.async_abort(reason="already_configured")
             try:
                 status = await self._get_status_data(
                     ip_address=user_input[CONF_IP_ADDRESS]
