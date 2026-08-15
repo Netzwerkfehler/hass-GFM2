@@ -8,7 +8,6 @@ from custom_components.gfm2.const import DOMAIN
 
 from .conftest import TEST_SERIAL, load_json_fixture
 
-# Wird in Task 13 auf 19 erhöht, wenn der PON-Status-Sensor dazukommt.
 EXPECTED_ENTITY_COUNT = 18
 
 
