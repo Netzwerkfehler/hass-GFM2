@@ -21,7 +21,7 @@ async def test_hardware_status_ok(hass, config_entry, mock_api):
     )
 
 
-async def test_hardware_fault_and_no_link(hass, config_entry, mock_api):
+async def test_hardware_fault(hass, config_entry, mock_api):
     mock_api["status"].return_value = load_json_fixture("status_hw_fault.json")
     await _setup(hass, config_entry)
     assert (
