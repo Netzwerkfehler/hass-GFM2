@@ -32,6 +32,16 @@ class Gfm2Entity(CoordinatorEntity[Gfm2DataUpdateCoordinator]):
             serial_number=serial_number,
             name=device.device_name,
             hw_version=device.hardware_revision,
-            sw_version=f"{device.firmware_version} / UI: {device.ui_version}",
+            # Compose from what the device actually reported. Interpolating
+            # blindly puts "None / UI: None" on the device page.
+            sw_version=" / ".join(
+                part
+                for part in (
+                    device.firmware_version,
+                    f"UI: {device.ui_version}" if device.ui_version else None,
+                )
+                if part
+            )
+            or None,
             configuration_url=f"http://{coordinator.config_entry.data[CONF_IP_ADDRESS]}/ONT/client/html/content/overview/index.html",
         )

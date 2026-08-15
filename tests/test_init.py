@@ -6,7 +6,7 @@ from homeassistant.helpers import entity_registry as er
 
 from custom_components.gfm2.const import DOMAIN
 
-from .conftest import TEST_SERIAL
+from .conftest import TEST_SERIAL, load_json_fixture
 
 # Wird in Task 13 auf 19 erhöht, wenn der PON-Status-Sensor dazukommt.
 EXPECTED_ENTITY_COUNT = 18
@@ -45,6 +45,40 @@ async def test_setup_adopts_the_serial_number_as_unique_id(
     await hass.async_block_till_done()
 
     assert config_entry.unique_id == TEST_SERIAL
+
+
+async def test_missing_versions_never_reach_the_device_page(
+    hass, config_entry, mock_api, device_registry
+):
+    # Sonst steht "None / UI: None" auf der Geraeteseite.
+    mock_api["status"].return_value = load_json_fixture("status_incomplete.json")
+    config_entry.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    device = device_registry.async_get_device(
+        identifiers={(DOMAIN, config_entry.entry_id)}
+    )
+    assert device is not None
+    # Die UI-Version steht in status.json und fehlt hier, die Firmware-Version
+    # kommt vom eigenen Endpunkt und bleibt erhalten.
+    assert device.sw_version == "090144.1.0.001"
+
+
+async def test_no_versions_at_all_leave_the_software_version_empty(
+    hass, config_entry, mock_api, device_registry
+):
+    mock_api["status"].return_value = load_json_fixture("status_incomplete.json")
+    mock_api["firmware"].return_value = []
+    config_entry.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    device = device_registry.async_get_device(
+        identifiers={(DOMAIN, config_entry.entry_id)}
+    )
+    assert device is not None
+    assert device.sw_version is None
 
 
 async def test_device_identity_migrates_without_creating_a_second_device(
