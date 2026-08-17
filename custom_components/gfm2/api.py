@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
+import asyncio
 import socket
 from typing import Any
 
 import aiohttp
-import async_timeout
 
 
 class Gfm2ApiClientError(Exception):
@@ -73,7 +73,7 @@ class Gfm2ApiClient:
     ) -> Any:
         """Get information from the API."""
         try:
-            async with async_timeout.timeout(10):
+            async with asyncio.timeout(10):
                 response = await self._session.request(
                     method=method,
                     url=url,

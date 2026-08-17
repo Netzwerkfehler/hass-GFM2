@@ -9,9 +9,8 @@ if TYPE_CHECKING:
     from homeassistant.config_entries import ConfigEntry
     from homeassistant.loader import Integration
 
-    from custom_components.gfm2.gfm2 import Gfm2
-
     from .coordinator import Gfm2DataUpdateCoordinator
+    from .gfm2 import Gfm2
 
 
 type Gfm2ConfigEntry = ConfigEntry[Gfm2Data]

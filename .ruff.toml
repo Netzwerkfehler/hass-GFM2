@@ -23,3 +23,14 @@ keep-runtime-typing = true
 
 [lint.mccabe]
 max-complexity = 25
+
+[lint.per-file-ignores]
+"tests/**" = [
+    "S101",    # assert ist in Tests erwuenscht
+    "ANN",     # keine Annotationspflicht in Tests
+    "D10",     # keine Docstring-Pflicht pro Testfunktion
+    "PLR2004", # magic values in Assertions sind ok
+    "DTZ001",  # naive datetimes werden gezielt konstruiert
+    "ARG001",  # Fixture-Parameter wirken ungenutzt
+    "SLF001",  # Zugriff auf private Member in Tests
+]

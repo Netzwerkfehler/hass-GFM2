@@ -18,7 +18,7 @@ _Home Assistant community integration to integrate with the [Telekom Glasfaser-M
 - Dropped Packets
 - Link Uptime
 - Link Speed
-    - Note: Displays 0 for 2.5G connections
+    - Note: Reports the negotiated LAN speed in Mbit/s. Firmware 2020 incorrectly reports 0 for a 2.5G connection, which is shown as "unknown" instead.
 
 ### PON
 - Rx Power
@@ -35,12 +35,21 @@ _Home Assistant community integration to integrate with the [Telekom Glasfaser-M
 ### Other
 - Last Reboot
   - Only reboots via the modem's reboot button are noted
+  - Stays "unknown" on a modem that has never been rebooted that way
 - Hardware Status
 
 ## Buttons
 Name | Description
 ---- | ----------
 Restart | Restarts the modem
+
+## Languages
+The integration ships English and German translations and follows the language configured in Home Assistant.
+Existing installations keep their entity IDs, because those are tied to each entity's internal unique ID rather than to its displayed name.
+
+## Diagnostics
+The integration supports Home Assistant's diagnostics download, reachable from the device page.
+It contains the raw values of all three endpoints, with the modem's serial number redacted.
 
 ## Installation
 

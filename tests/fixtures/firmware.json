@@ -1,0 +1,10 @@
+[
+  {"vartype":"value","varid":"device_name","varvalue":"Glasfaser-Modem 2"},
+  {"vartype":"value","varid":"rebooting","varvalue":"0"},
+  {"vartype":"value","varid":"save_fails","varvalue":"0"},
+  {"vartype":"value","varid":"service_mode","varvalue":"0"},
+  {"vartype":"page_title","varid":"title","varvalue":"Glasfaser-Modem 2 Konfigurationsprogramm"},
+  {"vartype":"value","varid":"autofw_active","varvalue":"1"},
+  {"vartype":"value","varid":"firmware_version","varvalue":"090144.1.0.001"},
+  {"vartype":"value","varid":"firmware_date","varvalue":"2020-09-21 10:04:48"}
+]
