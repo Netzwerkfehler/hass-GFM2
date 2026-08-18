@@ -29,7 +29,7 @@ def _to_int(value: object) -> int | None:
     """
     try:
         return int(str(value))
-    except (TypeError, ValueError):
+    except TypeError, ValueError:
         return None
 
 
@@ -43,7 +43,7 @@ def _to_float(value: object) -> float | None:
     """
     try:
         number = float(str(value))
-    except (TypeError, ValueError):
+    except TypeError, ValueError:
         return None
     return number if math.isfinite(number) else None
 
