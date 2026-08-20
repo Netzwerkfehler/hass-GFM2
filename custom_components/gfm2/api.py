@@ -61,13 +61,14 @@ class Gfm2ApiClient:
             method="post",
             url=f"http://{self._ip_address}/ONT/client/data/Reboot.json",
             headers={"Accept-Language": "en"},
-            data={"Reboot": "true"},
+            data={"reboot_device": "true"},
         )
 
     async def _api_wrapper(
         self,
         method: str,
         url: str,
+        json: dict | None = None,
         data: dict | None = None,
         headers: dict | None = None,
     ) -> Any:
@@ -75,10 +76,7 @@ class Gfm2ApiClient:
         try:
             async with asyncio.timeout(10):
                 response = await self._session.request(
-                    method=method,
-                    url=url,
-                    headers=headers,
-                    json=data,
+                    method=method, url=url, headers=headers, json=json, data=data
                 )
                 return await response.json(content_type="application/javascript")
 

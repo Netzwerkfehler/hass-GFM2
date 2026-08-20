@@ -18,12 +18,7 @@ async def test_last_reboot_is_read_as_device_local_time(hass, config_entry, mock
     """
     The device reports local time, so it must not be parsed as UTC.
 
-    The fixture reports "03.12.2025 22:48". In Europe/Berlin that is UTC+1 in
-    winter, so the correct instant is 21:48 UTC. Parsing it as UTC instead puts
-    the timestamp one hour into the future.
-
-    Home Assistant renders timestamp states in UTC, so this compares the
-    instant rather than its notation.
+    The fixture reports "03.12.2025 22:48" in what seems to be UTC.
     """
     await hass.config.async_set_time_zone("Europe/Berlin")
     config_entry.add_to_hass(hass)
@@ -32,7 +27,7 @@ async def test_last_reboot_is_read_as_device_local_time(hass, config_entry, mock
 
     state = hass.states.get("sensor.glasfaser_modem_2_last_reboot")
     assert dt_util.parse_datetime(state.state) == datetime(
-        2025, 12, 3, 21, 48, tzinfo=UTC
+        2025, 12, 3, 22, 48, tzinfo=UTC
     )
 
 
