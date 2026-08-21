@@ -8,6 +8,7 @@ from custom_components.gfm2.gfm2 import Gfm2
 from .conftest import load_json_fixture
 
 BERLIN = ZoneInfo("Europe/Berlin")
+UTC = ZoneInfo("UTC")
 
 
 class StubApi:
@@ -31,8 +32,8 @@ class StubApi:
 async def test_reboot_timestamp_uses_configured_time_zone():
     device = Gfm2(StubApi(reboot=load_json_fixture("reboot.json")), time_zone=BERLIN)
     data = await device.get_reboot_data()
-    assert data["custom_last_reboot"] == datetime(2025, 12, 3, 22, 48, tzinfo=BERLIN)
-    assert data["custom_last_reboot"].utcoffset() == timedelta(hours=1)  # CET
+    assert data["custom_last_reboot"] == datetime(2025, 12, 3, 22, 48, tzinfo=UTC)
+    assert data["custom_last_reboot"].utcoffset() == timedelta(hours=0)  # UTC
 
 
 async def test_reboot_timestamp_is_none_when_never_rebooted():
@@ -53,9 +54,9 @@ async def test_firmware_timestamp_uses_configured_time_zone():
     )
     data = await device.get_firmware_data()
     assert data["firmware_firmware_date"] == datetime(
-        2020, 9, 21, 10, 4, 48, tzinfo=BERLIN
+        2020, 9, 21, 10, 4, 48, tzinfo=UTC
     )
-    assert data["firmware_firmware_date"].utcoffset() == timedelta(hours=2)  # CEST
+    assert data["firmware_firmware_date"].utcoffset() == timedelta(hours=0)  # UTC
 
 
 async def test_incomplete_status_does_not_raise():

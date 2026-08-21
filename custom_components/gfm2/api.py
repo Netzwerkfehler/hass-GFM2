@@ -7,6 +7,9 @@ import socket
 from typing import Any
 
 import aiohttp
+from aiohttp.client_exceptions import ServerDisconnectedError
+
+from .const import LOGGER
 
 
 class Gfm2ApiClientError(Exception):
@@ -57,17 +60,27 @@ class Gfm2ApiClient:
 
     async def async_do_reboot(self) -> Any:
         """Trigger a reboot from the API."""
-        return await self._api_wrapper(
-            method="post",
-            url=f"http://{self._ip_address}/ONT/client/data/Reboot.json",
-            headers={"Accept-Language": "en"},
-            data={"Reboot": "true"},
-        )
+        try:
+            return await self._api_wrapper(
+                method="post",
+                url=f"http://{self._ip_address}/ONT/client/data/Reboot.json",
+                headers={"Accept-Language": "en"},
+                data={"reboot_device": "true"},
+            )
+        except Gfm2ApiClientCommunicationError as exception:
+            # Device disconnects during reboot before sending a response,
+            # causing ServerDisconnectedError. This is (unfortunately)
+            # expected behavior.
+            if isinstance(exception.__cause__, ServerDisconnectedError):
+                LOGGER.info("Device is rebooting (server disconnected)")
+                return True
+            raise
 
     async def _api_wrapper(
         self,
         method: str,
         url: str,
+        json: dict | None = None,
         data: dict | None = None,
         headers: dict | None = None,
     ) -> Any:
@@ -75,10 +88,7 @@ class Gfm2ApiClient:
         try:
             async with asyncio.timeout(10):
                 response = await self._session.request(
-                    method=method,
-                    url=url,
-                    headers=headers,
-                    json=data,
+                    method=method, url=url, headers=headers, json=json, data=data
                 )
                 return await response.json(content_type="application/javascript")
 

@@ -5,6 +5,7 @@ from __future__ import annotations
 import math
 from datetime import datetime, tzinfo
 from typing import TYPE_CHECKING
+from zoneinfo import ZoneInfo
 
 if TYPE_CHECKING:
     from .api import Gfm2ApiClient
@@ -98,7 +99,8 @@ class Gfm2:
         """Read data from the firmware.json endpoint."""
         data = Gfm2.process_json(await self._api.async_get_firmware_data(), "firmware")
         data["firmware_firmware_date"] = self._parse_device_datetime(
-            str(data.get("firmware_firmware_date")), "%Y-%m-%d %H:%M:%S"
+            str(data.get("firmware_firmware_date")),
+            "%Y-%m-%d %H:%M:%S",
         )
         return data
 
@@ -113,18 +115,16 @@ class Gfm2:
 
     def _parse_device_datetime(self, raw: str, fmt: str) -> datetime | None:
         """Parse a device timestamp in the configured time zone, None on failure."""
+        # 'reboot_reboot_time' is reported in UTC, so 'firmware_firmware_date' will
+        # also be until somebody proves me wrong.
         try:
-            return datetime.strptime(raw, fmt).replace(tzinfo=self._time_zone)
+            return datetime.strptime(raw, fmt).replace(tzinfo=ZoneInfo("UTC"))
         except ValueError:
             return None
 
     async def reboot(self) -> None:
         """Reboots the modem."""
         await self._api.async_do_reboot()
-
-    async def test(self) -> bool:
-        """Test the connection."""
-        return await self._api.async_get_status_data() is not None
 
     def get_data_dict(self) -> dict[str, object]:
         """Return the data dict."""
