@@ -78,6 +78,8 @@ ENTITY_DESCRIPTIONS = (
         device_class=SensorDeviceClass.DATA_RATE,
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=UnitOfDataRate.MEGABITS_PER_SECOND,
+        # link speed needs no decimal places
+        suggested_display_precision=0,
     ),
     SensorEntityDescription(
         key="status_stability",
