@@ -18,7 +18,7 @@ _Home Assistant community integration to integrate with the [Telekom Glasfaser-M
 - Dropped Packets
 - Link Uptime
 - Link Speed
-    - Note: Reports the negotiated LAN speed in Mbit/s. Firmware 2020 incorrectly reports 0 for a 2.5G connection, which is shown as "unknown" instead.
+    - Note: Reports the negotiated LAN speed in Mbit/s. Firmware versions prior to 090144.1.0.013 incorrectly report 0 for a 2.5G connection, which is shown as "unknown" instead.
 
 ### PON
 - Rx Power
