@@ -8,6 +8,7 @@ from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
 from homeassistant.const import STATE_UNKNOWN, UnitOfDataRate, UnitOfInformation
 from homeassistant.util import dt as dt_util
 
+from custom_components.gfm2.api import Gfm2ApiClientCommunicationError
 from custom_components.gfm2.gfm2 import Gfm2
 
 from .conftest import load_json_fixture
@@ -98,3 +99,27 @@ async def test_numeric_values_are_numbers():
     assert data["status_txpower"] == 2.39
     assert isinstance(data["status_txpower"], float)
     assert data["status_rxbip_crc"] == 0
+
+
+async def test_extended_sensors_show_the_read_values(hass, config_entry, mock_api):
+    config_entry.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.glasfaser_modem_2_pon_state").state == "O1"
+    temperature = hass.states.get("sensor.glasfaser_modem_2_pon_optics_temperature")
+    assert float(temperature.state) == pytest.approx(31.05)
+    # 3205,80 mV bleiben nativ, angezeigt werden Volt.
+    voltage = hass.states.get("sensor.glasfaser_modem_2_pon_optics_voltage")
+    assert float(voltage.state) == pytest.approx(3.2058)
+    assert hass.states.get("sensor.glasfaser_modem_2_reboot_cause").state == "HW"
+
+
+async def test_no_extended_sensors_without_extended_data(hass, config_entry, mock_api):
+    mock_api["extended"].side_effect = Gfm2ApiClientCommunicationError("refused")
+    config_entry.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.glasfaser_modem_2_pon_state") is None
+    assert hass.states.get("sensor.glasfaser_modem_2_pon_rx_power") is not None

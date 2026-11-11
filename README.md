@@ -32,6 +32,20 @@ _Home Assistant community integration to integrate with the [Telekom Glasfaser-M
 - UI Version
 - Automatic Updates Enabled
 
+### Extended status
+These come from status pages of the Sercomm base firmware that the Telekom interface does not link to.
+The integration only reads them. A modem that does not serve them simply gets none of these entities.
+- PON State (O1 to O7; O5 is the operating state)
+- PON Optics Temperature
+- PON Optics Voltage
+- PON Laser Bias Current
+- CPU Usage
+- Memory Usage
+- Reboot Cause
+- Active Firmware Image
+
+Whether the modem serves these pages is decided when the integration starts. If they were unreachable at that moment, reload the integration.
+
 ### Other
 - Last Reboot
   - Only reboots via the modem's reboot button are noted

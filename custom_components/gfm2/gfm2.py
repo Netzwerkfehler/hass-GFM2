@@ -3,9 +3,13 @@
 from __future__ import annotations
 
 import math
+import re
 from datetime import datetime, tzinfo
 from typing import TYPE_CHECKING
 from zoneinfo import ZoneInfo
+
+from .api import Gfm2ApiClientError
+from .const import LOGGER
 
 if TYPE_CHECKING:
     from .api import Gfm2ApiClient
@@ -25,6 +29,14 @@ _FLOAT_KEYS = ("status_txpower", "status_rxpower")
 _UINT32_KEYS = ("status_txpackets", "status_rxpackets", "status_rxdrop_packets")
 _INT32_MIN = -(2**31)
 _UINT32_RANGE = 2**32
+
+# Status pages of the Sercomm base firmware, see get_extended_data.
+_EXTENDED_PAGES = (
+    "statussupport_gpon",
+    "statussupport_optical",
+    "statussupportstatus",
+)
+_GPON_STATE_PATTERN = re.compile(r"O[1-7]")
 
 
 def _to_int(value: object) -> int | None:
@@ -67,6 +79,18 @@ def _to_uint32(value: int | None) -> int | None:
     return value + _UINT32_RANGE
 
 
+def _to_percent(value: object) -> float | None:
+    """Convert a value like "66.36%" to a float, None when it is no number."""
+    return _to_float(str(value).strip().removesuffix("%"))
+
+
+def _to_text(value: object) -> str | None:
+    """Return a non-empty string, None for anything else."""
+    if not isinstance(value, str) or not value.strip():
+        return None
+    return value.strip()
+
+
 class Gfm2:
     """Class the abstracts some device API's."""
 
@@ -82,6 +106,7 @@ class Gfm2:
         all_data.update(await self.get_status_data())
         all_data.update(await self.get_firmware_data())
         all_data.update(await self.get_reboot_data())
+        all_data.update(await self.get_extended_data())
         self._all_data = all_data
         return all_data
 
@@ -132,6 +157,46 @@ class Gfm2:
             "%d.%m.%Y %H:%M",
         )
         return data
+
+    async def get_extended_data(self) -> dict[str, object]:
+        """
+        Read the status pages of the Sercomm base firmware.
+
+        These pages are not part of the Telekom interface, so nothing here may
+        take the documented sensors down with it: a modem that does not serve
+        them yields an empty dict and the caller carries on.
+        """
+        raw: dict[str, object] = {}
+        try:
+            for page in _EXTENDED_PAGES:
+                raw.update(
+                    Gfm2.process_extended_json(
+                        await self._api.async_get_extended_data(page)
+                    )
+                )
+        except Gfm2ApiClientError as exception:
+            LOGGER.debug("Extended status data not available: %s", exception)
+            return {}
+        if not raw:
+            return {}
+
+        gpon_state = str(raw.get("gpon_status"))
+        return {
+            "extended_gpon_state": (
+                gpon_state if _GPON_STATE_PATTERN.fullmatch(gpon_state) else None
+            ),
+            "extended_optical_temperature": _to_float(
+                raw.get("working_temperature_query")
+            ),
+            "extended_optical_voltage": _to_float(raw.get("working_voltage_query")),
+            "extended_optical_bias_current": _to_float(
+                raw.get("working_current_query")
+            ),
+            "extended_cpu_usage": _to_percent(raw.get("sys_cpu_usage")),
+            "extended_memory_usage": _to_percent(raw.get("sys_memory_usage")),
+            "extended_reboot_cause": _to_text(raw.get("sys_reboot_cause")),
+            "extended_active_image": _to_text(raw.get("sys_current_image")),
+        }
 
     def _parse_device_datetime(self, raw: str, fmt: str) -> datetime | None:
         """Parse a device timestamp in the configured time zone, None on failure."""
@@ -201,5 +266,23 @@ class Gfm2:
             if not varid:
                 continue
             flattened_data[f"{prefix}_{varid}"] = kvp.get("varvalue")
+
+        return flattened_data
+
+    @staticmethod
+    def process_extended_json(json_data: object) -> dict[str, object]:
+        """
+        Flatten a page of the Sercomm base firmware, tolerating malformed input.
+
+        A page is a list of objects with one key each. Several pages send every
+        key twice: first the placeholder from the page template, then the value
+        the modem actually read. The later one therefore wins.
+        """
+        flattened_data: dict[str, object] = {}
+        if not isinstance(json_data, list):
+            return flattened_data
+        for item in json_data:
+            if isinstance(item, dict):
+                flattened_data.update(item)
 
         return flattened_data

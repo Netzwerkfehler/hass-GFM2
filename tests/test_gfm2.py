@@ -5,9 +5,10 @@ from zoneinfo import ZoneInfo
 
 import pytest
 
+from custom_components.gfm2.api import Gfm2ApiClientCommunicationError
 from custom_components.gfm2.gfm2 import Gfm2
 
-from .conftest import load_json_fixture
+from .conftest import load_extended_fixture, load_json_fixture
 
 BERLIN = ZoneInfo("Europe/Berlin")
 UTC = ZoneInfo("UTC")
@@ -16,10 +17,16 @@ UTC = ZoneInfo("UTC")
 class StubApi:
     """Minimal stand-in for Gfm2ApiClient."""
 
-    def __init__(self, status=None, firmware=None, reboot=None):
+    def __init__(self, status=None, firmware=None, reboot=None, extended=None):
         self._status = status if status is not None else []
         self._firmware = firmware if firmware is not None else []
         self._reboot = reboot if reboot is not None else []
+        # Eine Funktion von Seitenname auf Antwort; ohne sie liefert der Stub
+        # leere Seiten wie ein Modem, das nichts zu melden hat.
+        self._extended = extended
+
+    async def async_get_extended_data(self, page):
+        return self._extended(page) if self._extended is not None else []
 
     async def async_get_status_data(self):
         return self._status
@@ -176,3 +183,61 @@ async def test_packet_counter_outside_32_bit_range_is_refused():
     device = Gfm2(StubApi(status=status), time_zone=BERLIN)
     data = await device.get_status_data()
     assert data["status_txpackets"] is None
+
+
+async def test_extended_data_takes_the_read_value_over_the_placeholder():
+    # Die Optikseite schickt jedes Feld doppelt: erst den Platzhalter der
+    # Vorlage (12000 mV, 90 mA, 50 Grad), dann den gelesenen Wert.
+    device = Gfm2(StubApi(extended=load_extended_fixture), time_zone=BERLIN)
+    data = await device.get_extended_data()
+    assert data["extended_optical_voltage"] == 3205.80
+    assert data["extended_optical_bias_current"] == 0.0
+    assert data["extended_optical_temperature"] == 31.05
+
+
+async def test_extended_data_reads_state_and_system_values():
+    device = Gfm2(StubApi(extended=load_extended_fixture), time_zone=BERLIN)
+    data = await device.get_extended_data()
+    assert data["extended_gpon_state"] == "O1"
+    assert data["extended_cpu_usage"] == 0.0
+    assert data["extended_memory_usage"] == 66.36
+    assert data["extended_reboot_cause"] == "HW"
+    assert data["extended_active_image"] == "FW1"
+
+
+async def test_extended_data_carries_no_identifiers():
+    # Die Seiten enthalten Seriennummern. Nichts davon darf in den Daten und
+    # damit in der Diagnose landen.
+    device = Gfm2(StubApi(extended=load_extended_fixture), time_zone=BERLIN)
+    data = await device.get_extended_data()
+    assert "53434F4D00C0FFEE" not in str(data)
+
+
+async def test_extended_data_is_empty_when_the_modem_does_not_serve_it():
+    def refuse(page):
+        raise Gfm2ApiClientCommunicationError(page)
+
+    device = Gfm2(
+        StubApi(status=load_json_fixture("status_full.json"), extended=refuse),
+        time_zone=BERLIN,
+    )
+    assert await device.get_extended_data() == {}
+    # Die dokumentierten Werte bleiben davon unberuehrt.
+    data = await device.get_all_data()
+    assert data["status_rxpower"] == -16.13
+    assert "extended_gpon_state" not in data
+
+
+async def test_extended_data_tolerates_malformed_pages():
+    device = Gfm2(
+        StubApi(extended=lambda _page: {"unexpected": "shape"}), time_zone=BERLIN
+    )
+    assert await device.get_extended_data() == {}
+
+    device = Gfm2(
+        StubApi(extended=lambda _page: [{"gpon_status": "bogus"}, "noise", None]),
+        time_zone=BERLIN,
+    )
+    data = await device.get_extended_data()
+    assert data["extended_gpon_state"] is None
+    assert data["extended_optical_temperature"] is None

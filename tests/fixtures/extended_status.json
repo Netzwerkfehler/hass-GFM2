@@ -1,0 +1,38 @@
+[
+  {
+    "sys_serial_number": "53434F4D00C0FFEE"
+  },
+  {
+    "sys_firmware_version": "090144.1.0.001"
+  },
+  {
+    "sys_bootloader_version": "0100"
+  },
+  {
+    "sys_hardware_version": "Glasfaser-Modem 2 Glasfaser.DTV1"
+  },
+  {
+    "sys_uptime": "0:0:3"
+  },
+  {
+    "sys_cpu_usage": "0.00%"
+  },
+  {
+    "sys_reboot_cause": "HW"
+  },
+  {
+    "sys_memory_usage": "66.36%"
+  },
+  {
+    "sys_model_name": "Glasfaser-Modem 2"
+  },
+  {
+    "sys_current_image": "FW1"
+  },
+  {
+    "sys_fw0_image_version": "090144.1.0.001"
+  },
+  {
+    "sys_fw1_image_version": "090144.1.0.001"
+  }
+]
