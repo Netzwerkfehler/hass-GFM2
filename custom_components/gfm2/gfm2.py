@@ -37,6 +37,8 @@ _EXTENDED_PAGES = (
     "statussupportstatus",
 )
 _GPON_STATE_PATTERN = re.compile(r"O[1-7]")
+# sys_uptime is days:hours:minutes, e.g. "6:13:51".
+_UPTIME_PATTERN = re.compile(r"(\d+):(\d+):(\d+)")
 
 
 def _to_int(value: object) -> int | None:
@@ -82,6 +84,17 @@ def _to_uint32(value: int | None) -> int | None:
 def _to_percent(value: object) -> float | None:
     """Convert a value like "66.36%" to a float, None when it is no number."""
     return _to_float(str(value).strip().removesuffix("%"))
+
+
+def _to_uptime_seconds(value: object) -> int | None:
+    """Convert an uptime like "6:13:51" (days:hours:minutes) to seconds."""
+    match = _UPTIME_PATTERN.fullmatch(str(value).strip())
+    if match is None:
+        return None
+    days, hours, minutes = (int(part) for part in match.groups())
+    if hours >= 24 or minutes >= 60:  # noqa: PLR2004 hours per day, minutes per hour
+        return None
+    return ((days * 24 + hours) * 60 + minutes) * 60
 
 
 def _to_text(value: object) -> str | None:
@@ -194,6 +207,7 @@ class Gfm2:
             ),
             "extended_cpu_usage": _to_percent(raw.get("sys_cpu_usage")),
             "extended_memory_usage": _to_percent(raw.get("sys_memory_usage")),
+            "extended_system_uptime": _to_uptime_seconds(raw.get("sys_uptime")),
             "extended_reboot_cause": _to_text(raw.get("sys_reboot_cause")),
             "extended_active_image": _to_text(raw.get("sys_current_image")),
         }

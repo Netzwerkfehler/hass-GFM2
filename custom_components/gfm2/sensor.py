@@ -196,6 +196,18 @@ EXTENDED_ENTITY_DESCRIPTIONS = (
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
     SensorEntityDescription(
+        key="extended_system_uptime",
+        translation_key="system_uptime",
+        icon="mdi:timer-outline",
+        device_class=SensorDeviceClass.DURATION,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        native_unit_of_measurement=UnitOfTime.SECONDS,
+        suggested_unit_of_measurement=UnitOfTime.DAYS,
+        # The modem counts in minutes, two decimals of a day are close to that.
+        suggested_display_precision=2,
+        entity_category=EntityCategory.DIAGNOSTIC,
+    ),
+    SensorEntityDescription(
         key="extended_reboot_cause",
         translation_key="reboot_cause",
         icon="mdi:restart-alert",

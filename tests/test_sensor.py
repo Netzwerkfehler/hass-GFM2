@@ -113,6 +113,9 @@ async def test_extended_sensors_show_the_read_values(hass, config_entry, mock_ap
     voltage = hass.states.get("sensor.glasfaser_modem_2_pon_optics_voltage")
     assert float(voltage.state) == pytest.approx(3.2058)
     assert hass.states.get("sensor.glasfaser_modem_2_reboot_cause").state == "HW"
+    # 0:0:3 sind drei Minuten, nativ in Sekunden, angezeigt in Tagen.
+    uptime = hass.states.get("sensor.glasfaser_modem_2_system_uptime")
+    assert float(uptime.state) == pytest.approx(180 / 86400)
 
 
 async def test_no_extended_sensors_without_extended_data(hass, config_entry, mock_api):

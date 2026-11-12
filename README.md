@@ -41,6 +41,8 @@ The integration only reads them. A modem that does not serve them simply gets no
 - PON Laser Bias Current
 - CPU Usage
 - Memory Usage
+- System Uptime
+  - Time since the modem last started, unlike LAN Link Uptime
 - Reboot Cause
 - Active Firmware Image
 

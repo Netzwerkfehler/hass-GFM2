@@ -241,3 +241,52 @@ async def test_extended_data_tolerates_malformed_pages():
     data = await device.get_extended_data()
     assert data["extended_gpon_state"] is None
     assert data["extended_optical_temperature"] is None
+
+
+def _load_fw013_fixture(page):
+    # Ausgabe des Maintainers aus Issue #143 (Firmware 090144.1.0.013) fuer
+    # die Seiten, die er gepostet hat. Die GPON-Seite fehlt dort.
+    return load_json_fixture(
+        {
+            "statussupport_optical": "extended_optical_fw013.json",
+            "statussupportstatus": "extended_status_fw013.json",
+        }.get(page, "extended_gpon_no_link.json")
+    )
+
+
+async def test_extended_data_reads_firmware_013():
+    device = Gfm2(StubApi(extended=_load_fw013_fixture), time_zone=BERLIN)
+    data = await device.get_extended_data()
+    assert data["extended_optical_voltage"] == 3221.40
+    assert data["extended_optical_bias_current"] == 11.45
+    assert data["extended_optical_temperature"] == 41.33
+    assert data["extended_cpu_usage"] == 2.01
+    assert data["extended_memory_usage"] == 69.49
+    assert data["extended_reboot_cause"] == "SW"
+    assert data["extended_active_image"] == "FW1"
+    assert "53434F4D00C0FFEE" not in str(data)
+
+
+@pytest.mark.parametrize(
+    ("fixture", "expected"),
+    [
+        # Tage:Stunden:Minuten, laut Maintainer in Issue #143.
+        (load_extended_fixture, 3 * 60),
+        (_load_fw013_fixture, ((6 * 24 + 13) * 60 + 51) * 60),
+    ],
+)
+async def test_system_uptime_is_read_as_days_hours_minutes(fixture, expected):
+    device = Gfm2(StubApi(extended=fixture), time_zone=BERLIN)
+    data = await device.get_extended_data()
+    assert data["extended_system_uptime"] == expected
+
+
+@pytest.mark.parametrize(
+    "raw", [None, "", "6:13", "6:13:51:00", "0:24:0", "0:0:60", "a:b:c", "-1:0:0"]
+)
+async def test_unreadable_system_uptime_is_unknown(raw):
+    device = Gfm2(
+        StubApi(extended=lambda _page: [{"sys_uptime": raw}]), time_zone=BERLIN
+    )
+    data = await device.get_extended_data()
+    assert data["extended_system_uptime"] is None

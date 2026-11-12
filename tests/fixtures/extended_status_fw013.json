@@ -1,0 +1,149 @@
+[
+  {
+    "sys_serial_number": "53434F4D00C0FFEE"
+  },
+  {
+    "sys_dt_serial_number": "0000000000000000"
+  },
+  {
+    "sys_firmware_version": "090144.1.0.013"
+  },
+  {
+    "sys_bootloader_version": "0100"
+  },
+  {
+    "sys_hardware_version": "Glasfaser-Modem 2 Glasfaser.DTV1"
+  },
+  {
+    "omci_software_version": "\t\t1.0.0.1_45001\t\t\n"
+  },
+  {
+    "sys_uptime": "6:13:51"
+  },
+  {
+    "sys_cpu_usage": "2.01%"
+  },
+  {
+    "sys_reboot_cause": "SW"
+  },
+  {
+    "sys_memory_usage": "69.49%"
+  },
+  {
+    "sys_date_time": "2026-11-12T15:19:58Z"
+  },
+  {
+    "sys_build_time": "2026-04-29 16:28:38\n"
+  },
+  {
+    "sys_model_name": "Glasfaser-Modem 2"
+  },
+  {
+    "sys_current_image": "FW1"
+  },
+  {
+    "sys_fw0_image_size": "27262976"
+  },
+  {
+    "sys_fw0_image_version": "090144.1.0.009"
+  },
+  {
+    "sys_fw0_image_crc": "6515C44B"
+  },
+  {
+    "sys_fw1_image_size": "27525120"
+  },
+  {
+    "sys_fw1_image_version": "090144.1.0.013"
+  },
+  {
+    "sys_fw1_image_crc": "064543CA"
+  },
+  {
+    "inter_gateway": ""
+  },
+  {
+    "inter_primary_dns": ""
+  },
+  {
+    "inter_secondary_dns": ""
+  },
+  {
+    "inter_firewall": "601036"
+  },
+  {
+    "inter_ipv6_link_local_address": ""
+  },
+  {
+    "inter_ipv6_link_global_address": ""
+  },
+  {
+    "inter_ipv6_gateway": ""
+  },
+  {
+    "inter_ipv6_prefix_delegation": ""
+  },
+  {
+    "inter_ipv6_dns_address1": ""
+  },
+  {
+    "inter_ipv6_dns_address2": ""
+  },
+  {
+    "lan_ip_network": "192.168.100.1/24"
+  },
+  {
+    "lan_default_gateway": "192.168.100.1"
+  },
+  {
+    "lan_mac_address": "00:00:00:00:00:00"
+  },
+  {
+    "lan_dhcp_server": "601036"
+  },
+  {
+    "lan_dhcpv6_server": "601036"
+  },
+  {
+    "lan_router_advertisement": "601036"
+  },
+  {
+    "lan_ipv6_default_gateway": ""
+  },
+  {
+    "lan_port1_switch_mode": "1301722"
+  },
+  {
+    "lan_port2_switch_mode": "1301722"
+  },
+  {
+    "lan_port3_switch_mode": "1301722"
+  },
+  {
+    "lan_port4_switch_mode": "1301722"
+  },
+  {
+    "lan_port1_switch_speed": "2500"
+  },
+  {
+    "lan_port2_switch_speed": "2500"
+  },
+  {
+    "lan_port3_switch_speed": "2500"
+  },
+  {
+    "lan_port4_switch_speed": "2500"
+  },
+  {
+    "lan_port1_switch_status": "1301724"
+  },
+  {
+    "lan_port2_switch_status": "1301724"
+  },
+  {
+    "lan_port3_switch_status": "1301724"
+  },
+  {
+    "lan_port4_switch_status": "1301724"
+  }
+]

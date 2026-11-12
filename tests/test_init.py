@@ -8,8 +8,8 @@ from custom_components.gfm2.const import DOMAIN
 
 from .conftest import TEST_SERIAL, load_json_fixture
 
-# 18 aus der Telekom-Oberflaeche, 8 aus den Statusseiten der Sercomm-Basis.
-EXPECTED_ENTITY_COUNT = 26
+# 18 aus der Telekom-Oberflaeche, 9 aus den Statusseiten der Sercomm-Basis.
+EXPECTED_ENTITY_COUNT = 27
 
 
 async def test_setup_creates_all_entities(hass, config_entry, mock_api):

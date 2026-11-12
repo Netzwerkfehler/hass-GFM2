@@ -38,6 +38,7 @@
       "pon_laser_bias_current": { "name": "PON Laser-Biasstrom" },
       "cpu_usage": { "name": "CPU-Auslastung" },
       "memory_usage": { "name": "Speicherauslastung" },
+      "system_uptime": { "name": "System-Laufzeit" },
       "reboot_cause": { "name": "Neustartgrund" },
       "active_firmware_image": { "name": "Aktives Firmware-Abbild" }
     },
