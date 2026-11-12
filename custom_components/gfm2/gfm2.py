@@ -20,6 +20,11 @@ _INT_KEYS = (
     "status_rxbip_crc",
 )
 _FLOAT_KEYS = ("status_txpower", "status_rxpower")
+# The modem keeps its packet counters in 32 bits but prints them signed, so a
+# counter past 2**31 shows up negative while it keeps counting.
+_UINT32_KEYS = ("status_txpackets", "status_rxpackets", "status_rxdrop_packets")
+_INT32_MIN = -(2**31)
+_UINT32_RANGE = 2**32
 
 
 def _to_int(value: object) -> int | None:
@@ -47,6 +52,19 @@ def _to_float(value: object) -> float | None:
     except TypeError, ValueError:
         return None
     return number if math.isfinite(number) else None
+
+
+def _to_uint32(value: int | None) -> int | None:
+    """
+    Read a signed 32-bit counter as unsigned.
+
+    Return None for a negative value that no 32-bit counter can produce.
+    """
+    if value is None or value >= 0:
+        return value
+    if value < _INT32_MIN:
+        return None
+    return value + _UINT32_RANGE
 
 
 class Gfm2:
@@ -90,6 +108,8 @@ class Gfm2:
 
         for key in _INT_KEYS:
             data[key] = _to_int(data.get(key))
+        for key in _UINT32_KEYS:
+            data[key] = _to_uint32(data[key])
         for key in _FLOAT_KEYS:
             data[key] = _to_float(data.get(key))
 
