@@ -3,6 +3,8 @@
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
+import pytest
+
 from custom_components.gfm2.gfm2 import Gfm2
 
 from .conftest import load_json_fixture
@@ -146,3 +148,31 @@ async def test_blank_serial_number_is_refused():
     device = Gfm2(StubApi(status=status), time_zone=BERLIN)
     await device.get_all_data()
     assert device.serial_number is None
+
+
+@pytest.mark.parametrize(
+    ("raw", "expected"),
+    [
+        # Werte aus Issue #142: der Zaehler laeuft weiter, wird aber signed
+        # ausgegeben, sobald er 2**31 ueberschreitet.
+        ("-2119064655", 2175902641),
+        ("-1", 4294967295),
+        ("-2147483648", 2147483648),
+        ("2147483647", 2147483647),
+        ("0", 0),
+    ],
+)
+@pytest.mark.parametrize("varid", ["txpackets", "rxpackets", "rxdrop_packets"])
+async def test_packet_counters_are_read_as_unsigned_32_bit(varid, raw, expected):
+    status = [{"vartype": "value", "varid": varid, "varvalue": raw}]
+    device = Gfm2(StubApi(status=status), time_zone=BERLIN)
+    data = await device.get_status_data()
+    assert data[f"status_{varid}"] == expected
+
+
+async def test_packet_counter_outside_32_bit_range_is_refused():
+    # Unterhalb von -2**31 kann es kein umgedeuteter 32-Bit-Zaehler sein.
+    status = [{"vartype": "value", "varid": "txpackets", "varvalue": "-2147483649"}]
+    device = Gfm2(StubApi(status=status), time_zone=BERLIN)
+    data = await device.get_status_data()
+    assert data["status_txpackets"] is None
