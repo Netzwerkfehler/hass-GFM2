@@ -109,9 +109,10 @@ async def test_extended_sensors_show_the_read_values(hass, config_entry, mock_ap
     assert hass.states.get("sensor.glasfaser_modem_2_pon_state").state == "O1"
     temperature = hass.states.get("sensor.glasfaser_modem_2_pon_optics_temperature")
     assert float(temperature.state) == pytest.approx(31.05)
-    # 3205,80 mV bleiben nativ, angezeigt werden Volt.
+    # Die Spannung bleibt in mV, in Volt ginge die Auflösung verloren.
     voltage = hass.states.get("sensor.glasfaser_modem_2_pon_optics_voltage")
-    assert float(voltage.state) == pytest.approx(3.2058)
+    assert float(voltage.state) == pytest.approx(3205.80)
+    assert voltage.attributes["unit_of_measurement"] == "mV"
     assert hass.states.get("sensor.glasfaser_modem_2_reboot_cause").state == "HW"
     # 0:0:3 sind drei Minuten, nativ in Sekunden, angezeigt in Tagen.
     uptime = hass.states.get("sensor.glasfaser_modem_2_system_uptime")

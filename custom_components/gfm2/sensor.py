@@ -167,8 +167,6 @@ EXTENDED_ENTITY_DESCRIPTIONS = (
         device_class=SensorDeviceClass.VOLTAGE,
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=UnitOfElectricPotential.MILLIVOLT,
-        suggested_unit_of_measurement=UnitOfElectricPotential.VOLT,
-        suggested_display_precision=2,
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
     SensorEntityDescription(
