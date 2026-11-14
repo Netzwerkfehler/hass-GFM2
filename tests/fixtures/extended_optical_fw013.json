@@ -1,0 +1,65 @@
+[
+  {
+    "module_name_query": "-"
+  },
+  {
+    "module_name_recommend": "N/A"
+  },
+  {
+    "vendor_id_query": "-"
+  },
+  {
+    "vendor_id_recommend": "N/A"
+  },
+  {
+    "transmit_power_query": "3.3"
+  },
+  {
+    "transmit_power_recommend": "0.5 ~ 5"
+  },
+  {
+    "received_power_query": "-12"
+  },
+  {
+    "received_power_recommend": "-30 ~ -8"
+  },
+  {
+    "working_voltage_query": "12000"
+  },
+  {
+    "working_voltage_recommend": "3130 ~ 3470"
+  },
+  {
+    "working_current_query": "90"
+  },
+  {
+    "working_current_recommend": "0 ~ 90"
+  },
+  {
+    "working_temperature_query": "50"
+  },
+  {
+    "working_temperature_recommend": "-10 ~ 85"
+  },
+  {
+    "module_name_query": "GN25L95"
+  },
+  {
+    "vendor_id_query": "SERCOMM_B+_G"
+  },
+  {
+    "transmit_power_query": "2.41"
+  },
+  {
+    "received_power_query": "-15.95"
+  },
+  {
+    "working_voltage_query": "3221.40"
+  },
+  {
+    "working_current_query": "11.45"
+  },
+  {
+    "working_temperature_query": "41.33"
+  }
+]

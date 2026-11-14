@@ -1,0 +1,32 @@
+[
+  {
+    "gpon_sn": "53434F4D00C0FFEE"
+  },
+  {
+    "gpon_status": "O1"
+  },
+  {
+    "gpon_received_pwr": "-16.31"
+  },
+  {
+    "gpon_transmit_pwr": "2.74"
+  },
+  {
+    "gpon_status_reset": "0"
+  },
+  {
+    "gpon_sn": "53434F4D00C0FFEE"
+  },
+  {
+    "gpon_status": "O1"
+  },
+  {
+    "gpon_received_pwr": "N/A"
+  },
+  {
+    "gpon_transmit_pwr": "N/A"
+  },
+  {
+    "gpon_customer": "DTTEL"
+  }
+]

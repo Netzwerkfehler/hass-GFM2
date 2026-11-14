@@ -31,7 +31,16 @@
       "ui_version": { "name": "UI-Version" },
       "firmware_version": { "name": "Firmware-Version" },
       "firmware_date": { "name": "Firmware-Datum" },
-      "last_reboot": { "name": "Letzter Neustart" }
+      "last_reboot": { "name": "Letzter Neustart" },
+      "pon_state": { "name": "PON Zustand" },
+      "pon_optics_temperature": { "name": "PON Optik-Temperatur" },
+      "pon_optics_voltage": { "name": "PON Optik-Spannung" },
+      "pon_laser_bias_current": { "name": "PON Laser-Biasstrom" },
+      "cpu_usage": { "name": "CPU-Auslastung" },
+      "memory_usage": { "name": "Speicherauslastung" },
+      "system_uptime": { "name": "System-Laufzeit" },
+      "reboot_cause": { "name": "Neustartgrund" },
+      "active_firmware_image": { "name": "Aktives Firmware-Abbild" }
     },
     "binary_sensor": {
       "hardware_status": { "name": "Hardware-Status" },

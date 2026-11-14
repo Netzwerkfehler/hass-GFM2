@@ -21,6 +21,18 @@ def load_json_fixture(name: str) -> object:
     return json.loads((FIXTURES / name).read_text())
 
 
+EXTENDED_FIXTURES = {
+    "statussupport_gpon": "extended_gpon_no_link.json",
+    "statussupport_optical": "extended_optical_no_link.json",
+    "statussupportstatus": "extended_status.json",
+}
+
+
+def load_extended_fixture(page: str) -> object:
+    """Load the recorded answer for one page of the Sercomm base firmware."""
+    return load_json_fixture(EXTENDED_FIXTURES[page])
+
+
 @pytest.fixture(autouse=True)
 def auto_enable_custom_integrations(enable_custom_integrations):
     """Enable loading custom integrations in all tests."""
@@ -54,6 +66,10 @@ def mock_api():
             return_value=load_json_fixture("reboot.json"),
         ) as reboot_mock,
         patch(
+            "custom_components.gfm2.api.Gfm2ApiClient.async_get_extended_data",
+            side_effect=load_extended_fixture,
+        ) as extended_mock,
+        patch(
             "custom_components.gfm2.api.Gfm2ApiClient.async_do_reboot",
             return_value=None,
         ) as do_reboot_mock,
@@ -62,5 +78,6 @@ def mock_api():
             "status": status_mock,
             "firmware": firmware_mock,
             "reboot": reboot_mock,
+            "extended": extended_mock,
             "do_reboot": do_reboot_mock,
         }
